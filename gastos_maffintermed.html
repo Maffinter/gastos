@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gastos Efectuados · MAFFINTERMED</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  // ── EmailJS config — rellena con tus datos de emailjs.com ──
+  const EMAILJS_PUBLIC_KEY  = 'LtkR1goAeI7YHTIF2';
+  const EMAILJS_SERVICE_ID  = 'service_rp02g37';
+  const EMAILJS_TEMPLATE_ID = '4bxndqp';
+  const DESTINO_EMAIL       = 'alonso@maffinter.com';
+</script>
+<style>
+:root {
+  --bg: #F4F2EE;
+  --card: #FFFFFF;
+  --navy: #0E2140;
+  --navy2: #1A3560;
+  --orange: #C9481A;
+  --orange2: #A83D14;
+  --border: #DDD9CF;
+  --light: #EDEAE3;
+  --text: #111827;
+  --muted: #6B7280;
+  --green: #166534;
+  --green-bg: #DCFCE7;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.header {
+  background: var(--navy);
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.brand-name {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.06em;
+}
+.brand-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.header-date {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  text-align: right;
+}
+
+/* ── Progress bar ── */
+.progress-bar-wrap {
+  background: var(--navy2);
+  padding: 0 28px 20px;
+}
+.steps-row {
+  display: flex;
+  align-items: center;
+  max-width: 580px;
+  margin: 0 auto;
+}
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.step-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.3);
+  flex-shrink: 0;
+  transition: all .3s;
+}
+.step-item.active .step-dot { background: var(--orange); border-color: var(--orange); color: #fff; }
+.step-item.done .step-dot { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); color: #fff; }
+.step-label {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  transition: color .3s;
+  white-space: nowrap;
+}
+.step-item.active .step-label, .step-item.done .step-label { color: rgba(255,255,255,0.75); }
+.step-connector {
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.12);
+  margin: 0 4px;
+}
+
+/* ── Main wrapper ── */
+.main { max-width: 620px; margin: 28px auto 80px; padding: 0 16px; }
+
+/* ── Cards ── */
+.card {
+  background: var(--card);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+.card-head {
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid var(--border);
+  background: #FAFAF7;
+}
+.card-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 20px;
+  color: var(--navy);
+  font-weight: 700;
+}
+.card-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.card-body { padding: 26px; }
+
+/* ── Form ── */
+.fgroup { margin-bottom: 18px; }
+.flabel {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 7px;
+}
+.finput {
+  width: 100%;
+  padding: 10px 13px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: #fff;
+  transition: border-color .2s, box-shadow .2s;
+  outline: none;
+  -webkit-appearance: none;
+}
+.finput:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(14,33,64,0.08); }
+.finput.error { border-color: #DC2626; }
+textarea.finput { resize: vertical; }
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.amount-wrap { position: relative; }
+.currency-sym { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-weight: 500; font-size: 14px; pointer-events: none; }
+.amount-wrap .finput { padding-left: 26px; }
+
+/* ── Upload zone ── */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 36px 20px;
+  text-align: center;
+  cursor: pointer;
+  background: #FAFAF7;
+  transition: all .2s;
+}
+.upload-zone:hover, .upload-zone.over { border-color: var(--navy); background: rgba(14,33,64,0.04); }
+.upload-icon { font-size: 36px; margin-bottom: 10px; }
+.upload-zone p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+.upload-zone strong { color: var(--navy); }
+.preview-wrap { position: relative; margin-top: 14px; }
+.preview-wrap img { width: 100%; max-height: 420px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border); display: block; }
+.btn-rm { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.55); color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+
+/* ── Signature ── */
+#signCanvas {
+  width: 100%;
+  height: 180px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  cursor: crosshair;
+  touch-action: none;
+  display: block;
+}
+.sig-hint { font-size: 11.5px; color: var(--muted); margin-top: 8px; text-align: center; }
+
+/* ── Summary ── */
+.doc-badge {
+  background: var(--navy);
+  color: #fff;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.doc-badge-label { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.14em; color: rgba(255,255,255,0.5); margin-bottom: 5px; }
+.doc-badge-num { font-family: 'Libre Baskerville', serif; font-size: 22px; font-weight: 700; letter-spacing: 0.04em; }
+.doc-badge-icon { font-size: 30px; opacity: .8; }
+.sum-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 20px; }
+.sum-row:last-child { border-bottom: none; }
+.sum-label { font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); flex-shrink: 0; width: 150px; }
+.sum-value { font-size: 13.5px; color: var(--text); text-align: right; flex: 1; }
+
+/* ── Buttons ── */
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all .18s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn-navy { background: var(--navy); color: #fff; }
+.btn-navy:hover:not(:disabled) { background: var(--navy2); }
+.btn-ghost { background: transparent; color: var(--navy); border: 1.5px solid var(--border); }
+.btn-ghost:hover:not(:disabled) { border-color: var(--navy); background: rgba(14,33,64,0.04); }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-orange:hover:not(:disabled) { background: var(--orange2); }
+.btn-sm { padding: 7px 14px; font-size: 12px; }
+.btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 26px; flex-wrap: wrap; gap: 10px; }
+.btn-right { display: flex; gap: 10px; align-items: center; }
+
+/* ── Steps ── */
+.panel { display: none; }
+.panel.active { display: block; animation: fadeUp .3s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--navy);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: transform .3s;
+  z-index: 999;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── Validation msg ── */
+.errmsg { font-size: 11.5px; color: #DC2626; margin-top: 5px; display: none; }
+.fgroup.has-error .finput { border-color: #DC2626; }
+.fgroup.has-error .errmsg { display: block; }
+
+@media (max-width: 480px) {
+  .frow { grid-template-columns: 1fr; }
+  .steps-row .step-label { display: none; }
+  .header { padding: 14px 16px; }
+  .card-body { padding: 18px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="brand-name">MAFFINTERMED</div>
+    <div class="brand-sub">Gestión de Gastos</div>
+  </div>
+  <div class="header-date" id="hdrDate"></div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar-wrap">
+  <div class="steps-row">
+    <div class="step-item active" id="si1">
+      <div class="step-dot">1</div>
+      <div class="step-label">Datos</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item" id="si2">
+      <div class="step-dot">2</div>
+      <div class="step-label">Ticket</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item" id="si3">
+      <div class="step-dot">3</div>
+      <div class="step-label">Firma</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item" id="si4">
+      <div class="step-dot">4</div>
+      <div class="step-label">Generar</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STEP 1: DATOS -->
+  <div class="panel active" id="p1">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Datos del gasto</div>
+        <div class="card-sub">Rellena los datos del gasto realizado</div>
+      </div>
+      <div class="card-body">
+        <div class="fgroup" id="fg-nombre">
+          <label class="flabel">Persona solicitante *</label>
+          <input class="finput" id="nombre" type="text" placeholder="Nombre y apellidos" autocomplete="name">
+          <div class="errmsg">Este campo es obligatorio</div>
+        </div>
+        <div class="fgroup" id="fg-descripcion">
+          <label class="flabel">Descripción del gasto *</label>
+          <input class="finput" id="descripcion" type="text" placeholder="Ej: CONSUMIBLES COCINA">
+          <div class="errmsg">Este campo es obligatorio</div>
+        </div>
+        <div class="fgroup" id="fg-pago">
+          <label class="flabel">Forma de pago *</label>
+          <select class="finput" id="pago">
+            <option value="">Seleccionar…</option>
+            <option value="Tarjeta de empresa">💳 Tarjeta de empresa</option>
+            <option value="Efectivo caja">🏦 Efectivo caja</option>
+            <option value="Pendiente de pago (Contabilidad)">⏳ Pendiente — pagar desde Contabilidad</option>
+            <option value="Pagado por el solicitante — pendiente devolución">↩ Pagado por el/la solicitante — pendiente devolución</option>
+          </select>
+          <div class="errmsg">Selecciona la forma de pago</div>
+        </div>
+        <div class="frow">
+          <div class="fgroup" id="fg-importe">
+            <label class="flabel">Importe (€) *</label>
+            <div class="amount-wrap">
+              <span class="currency-sym">€</span>
+              <input class="finput" id="importe" type="number" step="0.01" min="0.01" placeholder="0,00">
+            </div>
+            <div class="errmsg">Introduce un importe válido</div>
+          </div>
+          <div class="fgroup" id="fg-fecha">
+            <label class="flabel">Fecha *</label>
+            <input class="finput" id="fecha" type="date">
+            <div class="errmsg">Introduce la fecha</div>
+          </div>
+        </div>
+        <div class="fgroup">
+          <label class="flabel">Otros detalles</label>
+          <textarea class="finput" id="detalles" rows="2" placeholder="Información adicional (opcional)…"></textarea>
+        </div>
+        <div class="btn-row">
+          <span></span>
+          <button class="btn btn-navy" onclick="step1Next()">Siguiente: Adjuntar ticket →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: TICKET -->
+  <div class="panel" id="p2">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Adjuntar ticket o factura</div>
+        <div class="card-sub">Sube una foto o imagen del justificante original</div>
+      </div>
+      <div class="card-body">
+        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(event)">
+        <input type="file" id="fileCamera" accept="image/*" capture="environment" style="display:none" onchange="handleFile(event)">
+        <div class="upload-zone" id="uploadZone">
+          <div class="upload-icon">📎</div>
+          <p style="margin-bottom:14px"><strong>Adjuntar justificante</strong></p>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+            <button class="btn btn-navy" type="button" onclick="document.getElementById('fileCamera').click()">📷 Hacer foto</button>
+            <button class="btn btn-ghost" type="button" onclick="document.getElementById('fileInput').click()">🖼 Elegir de galería</button>
+          </div>
+          <p style="font-size:12px;margin-top:10px;color:var(--muted)">JPG, PNG · Máx. 10 MB</p>
+        </div>
+        <div class="preview-wrap" id="previewWrap" style="display:none">
+          <img id="previewImg" alt="Vista previa del ticket">
+          <button class="btn-rm" onclick="removeImg()" title="Eliminar imagen">✕</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goTo(1)">← Anterior</button>
+          <div class="btn-right">
+            <button class="btn btn-ghost" id="btnSkip" onclick="goTo(3)">Omitir</button>
+            <button class="btn btn-navy" onclick="goTo(3)">Siguiente: Firma →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: FIRMA -->
+  <div class="panel" id="p3">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Firma digital</div>
+        <div class="card-sub">Firma con el ratón o con el dedo en la pantalla táctil</div>
+      </div>
+      <div class="card-body">
+        <canvas id="signCanvas"></canvas>
+        <div class="sig-hint">Dibuja tu firma en el recuadro de arriba</div>
+        <div style="text-align:right;margin-top:10px">
+          <button class="btn btn-ghost btn-sm" onclick="clearSig()">🗑 Borrar firma</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goTo(2)">← Anterior</button>
+          <button class="btn btn-navy" onclick="step3Next()">Siguiente: Resumen →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: RESUMEN & PDF -->
+  <div class="panel" id="p4">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Resumen y justificante</div>
+        <div class="card-sub">Revisa los datos y descarga el PDF para archivar</div>
+      </div>
+      <div class="card-body">
+        <div class="doc-badge">
+          <div>
+            <div class="doc-badge-label">Número de documento</div>
+            <div class="doc-badge-num" id="docNumTxt">—</div>
+          </div>
+          <div class="doc-badge-icon">📄</div>
+        </div>
+        <div id="summaryRows"></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goTo(3)">← Anterior</button>
+          <button class="btn btn-orange" id="btnPDF" onclick="generatePDF()">
+            ⬇ Descargar justificante PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────
+let receiptDataURL = null;
+let docNumber = null;
+let sigReady = false;
+let _isDrawing = false;
+
+// ── Init ───────────────────────────────────────────────
+const now = new Date();
+document.getElementById('hdrDate').innerHTML =
+  now.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+document.getElementById('fecha').valueAsDate = now;
+
+// Drag & drop
+const uz = document.getElementById('uploadZone');
+uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('over'); });
+uz.addEventListener('dragleave', () => uz.classList.remove('over'));
+uz.addEventListener('drop', e => {
+  e.preventDefault(); uz.classList.remove('over');
+  if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
+});
+
+// ── Navigation ─────────────────────────────────────────
+function goTo(n) {
+  document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', i+1===n));
+  document.querySelectorAll('.step-item').forEach((s,i) => {
+    s.classList.remove('active','done');
+    if (i+1 < n) s.classList.add('done');
+    if (i+1 === n) s.classList.add('active');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (n === 3) initCanvas();
+}
+
+function step1Next() {
+  const checks = [
+    {id:'nombre', fg:'fg-nombre'},
+    {id:'descripcion', fg:'fg-descripcion'},
+    {id:'pago', fg:'fg-pago'},
+    {id:'importe', fg:'fg-importe'},
+    {id:'fecha', fg:'fg-fecha'},
+  ];
+  let ok = true;
+  checks.forEach(({id,fg}) => {
+    const val = document.getElementById(id).value.trim();
+    const fgEl = document.getElementById(fg);
+    if (!val || (id==='importe' && parseFloat(val) <= 0)) {
+      fgEl.classList.add('has-error'); ok = false;
+    } else {
+      fgEl.classList.remove('has-error');
+    }
+  });
+  if (!ok) { showToast('⚠ Completa todos los campos obligatorios'); return; }
+  goTo(2);
+}
+
+function step3Next() {
+  if (!hasSig()) { showToast('⚠ Por favor añade tu firma antes de continuar'); return; }
+  buildSummary().then(() => goTo(4));
+}
+
+// ── File upload ────────────────────────────────────────
+function handleFile(e) { if (e.target.files[0]) processFile(e.target.files[0]); }
+
+function processFile(file) {
+  if (file.size > 10*1024*1024) { showToast('⚠ Archivo demasiado grande (máx. 10 MB)'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    receiptDataURL = e.target.result;
+    document.getElementById('previewImg').src = receiptDataURL;
+    document.getElementById('previewWrap').style.display = 'block';
+    document.getElementById('uploadZone').style.display = 'none';
+    document.getElementById('btnSkip').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImg() {
+  receiptDataURL = null;
+  document.getElementById('previewWrap').style.display = 'none';
+  document.getElementById('uploadZone').style.display = 'block';
+  document.getElementById('btnSkip').style.display = 'inline-flex';
+  document.getElementById('fileInput').value = '';
+}
+
+// ── Signature canvas ───────────────────────────────────
+function initCanvas() {
+  const c = document.getElementById('signCanvas');
+  if (sigReady) return;
+  sigReady = true;
+  c.width = c.offsetWidth;
+  c.height = 180;
+  const ctx = c.getContext('2d');
+  ctx.strokeStyle = '#0E2140';
+  ctx.lineWidth = 2.2;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  function px(e) {
+    const r = c.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return [(src.clientX - r.left) * c.width / r.width,
+            (src.clientY - r.top) * c.height / r.height];
+  }
+
+  c.addEventListener('mousedown', e => { _isDrawing=true; ctx.beginPath(); ctx.moveTo(...px(e)); });
+  c.addEventListener('mousemove', e => { if(!_isDrawing) return; ctx.lineTo(...px(e)); ctx.stroke(); });
+  c.addEventListener('mouseup', () => _isDrawing=false);
+  c.addEventListener('mouseleave', () => _isDrawing=false);
+  c.addEventListener('touchstart', e => { e.preventDefault(); _isDrawing=true; ctx.beginPath(); ctx.moveTo(...px(e)); }, {passive:false});
+  c.addEventListener('touchmove', e => { e.preventDefault(); if(!_isDrawing) return; ctx.lineTo(...px(e)); ctx.stroke(); }, {passive:false});
+  c.addEventListener('touchend', () => _isDrawing=false);
+}
+
+function clearSig() {
+  const c = document.getElementById('signCanvas');
+  c.getContext('2d').clearRect(0,0,c.width,c.height);
+}
+
+function hasSig() {
+  const c = document.getElementById('signCanvas');
+  const d = c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+  for (let i=3; i<d.length; i+=4) if (d[i] > 10) return true;
+  return false;
+}
+
+function getSigURL() { return document.getElementById('signCanvas').toDataURL('image/png'); }
+
+// ── Summary & numbering ────────────────────────────────
+async function buildSummary() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const fechaStr = document.getElementById('fecha').value;
+  const d = new Date(fechaStr + 'T12:00:00');
+  const year = d.getFullYear();
+  const month = String(d.getMonth()+1).padStart(2,'0');
+  const initials = nombre.split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,4);
+
+  // Persistent counter (shared across all users of this artifact)
+  const key = `maffin_counter_${year}_${month}_${initials}`;
+  let seq = 1;
+  try {
+    const r = await window.storage.get(key, true);
+    seq = r ? parseInt(r.value) + 1 : 1;
+  } catch(e) { seq = 1; }
+
+  docNumber = `${year}/${month}/${initials}/${String(seq).padStart(3,'0')}`;
+  document.getElementById('docNumTxt').textContent = docNumber;
+
+  const importe = parseFloat(document.getElementById('importe').value).toFixed(2);
+  const rows = [
+    ['Persona solicitante', nombre],
+    ['Descripción', document.getElementById('descripcion').value],
+    ['Importe', importe + ' €'],
+    ['Forma de pago', document.getElementById('pago').value],
+    ['Fecha del gasto', d.toLocaleDateString('es-ES')],
+    ['Ticket adjunto', receiptDataURL ? '✅ Sí' : '—'],
+    ['Firma digital', '✅ Firmado'],
+  ];
+  const det = document.getElementById('detalles').value.trim();
+  if (det) rows.push(['Otros detalles', det]);
+
+  document.getElementById('summaryRows').innerHTML = rows.map(([l,v])=>`
+    <div class="sum-row">
+      <div class="sum-label">${l}</div>
+      <div class="sum-value">${v}</div>
+    </div>`).join('');
+}
+
+// ── PDF generation ─────────────────────────────────────
+async function generatePDF() {
+  const btn = document.getElementById('btnPDF');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generando PDF…';
+
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:'mm', format:'a4' });
+    const W=210, H=297, M=18;
+
+    const navy = [14,33,64], navy2=[26,53,96];
+    const orange = [201,72,26];
+    const muted = [107,114,128];
+    const light = [237,234,227];
+    const white = [255,255,255];
+
+    // ── Header block ──
+    doc.setFillColor(...navy);
+    doc.rect(0, 0, W, 34, 'F');
+
+    doc.setTextColor(...white);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(15);
+    doc.text('MAFFINTERMED', M, 14);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(160,180,210);
+    doc.text('SISTEMA DE GESTIÓN DE GASTOS', M, 21);
+
+    // doc number badge
+    doc.setFillColor(...orange);
+    doc.roundedRect(W-M-58, 7, 58, 20, 2, 2, 'F');
+    doc.setTextColor(...white);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(6.5);
+    doc.text('Nº DOCUMENTO', W-M-55, 14);
+    doc.setFontSize(10);
+    doc.text(docNumber, W-M-55, 22);
+
+    // ── Title ──
+    doc.setTextColor(...navy);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(20);
+    doc.text('GASTO EFECTUADO', M, 48);
+    doc.setFillColor(...orange);
+    doc.rect(M, 51, 72, 0.9, 'F');
+
+    // ── Data fields ──
+    let y = 62;
+    const rh = 15;
+    const fw = W - M*2;
+
+    function drawField(label, value, x, w, yy, highlight=false) {
+      if (highlight) {
+        doc.setFillColor(...navy);
+      } else {
+        doc.setFillColor(...light);
+      }
+      doc.roundedRect(x, yy, w, rh, 1, 1, 'F');
+      if (highlight) {
+        doc.setTextColor(160,180,210);
+      } else {
+        doc.setTextColor(...muted);
+      }
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(6.5);
+      doc.text(label.toUpperCase(), x+4, yy+5);
+      if (highlight) {
+        doc.setTextColor(...white);
+      } else {
+        doc.setTextColor(...navy);
+      }
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(10.5);
+      doc.text(String(value), x+4, yy+12);
+    }
+
+    drawField('Persona solicitante', document.getElementById('nombre').value, M, fw, y);
+    y += rh + 2;
+    drawField('Descripción del gasto', document.getElementById('descripcion').value, M, fw, y);
+    y += rh + 2;
+
+    drawField('Forma de pago', document.getElementById('pago').value, M, fw, y);
+    y += rh + 2;
+
+    const hw = (fw - 3) / 2;
+    y += rh + 2;
+
+    const importe = parseFloat(document.getElementById('importe').value).toFixed(2) + ' €';
+    const fechaDisp = new Date(document.getElementById('fecha').value + 'T12:00:00').toLocaleDateString('es-ES');
+    drawField('Importe', importe, M, hw, y, true);
+    drawField('Fecha', fechaDisp, M+hw+3, hw, y);
+    y += rh + 2;
+
+    const det = document.getElementById('detalles').value.trim();
+    if (det) {
+      drawField('Otros detalles', det, M, fw, y);
+      y += rh + 2;
+    }
+
+    y += 4;
+
+    // ── Signature section ──
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7);
+    doc.setTextColor(...muted);
+    doc.text('FIRMA DEL SOLICITANTE', M, y);
+    y += 3;
+    doc.setDrawColor(...light);
+    doc.setLineWidth(0.5);
+    doc.rect(M, y, 78, 28);
+    const sigURL = getSigURL();
+    doc.addImage(sigURL, 'PNG', M+1, y+1, 76, 26);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...muted);
+    doc.text(document.getElementById('nombre').value.trim(), M, y+32);
+    doc.text(fechaDisp, M+78-doc.getTextWidth(fechaDisp), y+32);
+
+    // ── Receipt image ──
+    if (receiptDataURL && receiptDataURL.startsWith('data:image')) {
+      y += 40;
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(7);
+      doc.setTextColor(...muted);
+      doc.text('JUSTIFICANTE / TICKET ORIGINAL', M, y);
+      y += 3;
+
+      try {
+        const img = new Image();
+        await new Promise(res => { img.onload = res; img.src = receiptDataURL; });
+        const maxW = fw, maxH = 80;
+        const ratio = img.naturalHeight / img.naturalWidth;
+        let iw = maxW, ih = iw * ratio;
+        if (ih > maxH) { ih = maxH; iw = ih / ratio; }
+        const ix = M + (fw - iw) / 2;
+        doc.setFillColor(250,249,247);
+        doc.rect(M, y, fw, ih+4, 'F');
+        doc.addImage(receiptDataURL, 'JPEG', ix, y+2, iw, ih);
+        y += ih + 8;
+      } catch(err) {}
+    }
+
+    // ── Authorization footer ──
+    const footY = H - 42;
+    doc.setFillColor(245,243,239);
+    doc.rect(0, footY, W, 42, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...navy);
+    doc.text('AUTORIZACIONES', M, footY+8);
+
+    const bw = 76;
+    doc.setDrawColor(190,185,175);
+    doc.setLineWidth(0.4);
+    doc.rect(M, footY+11, bw, 22);
+    doc.rect(W-M-bw, footY+11, bw, 22);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7);
+    doc.setTextColor(...muted);
+    doc.text('Jefe o Director del Dpto.', M+3, footY+30);
+    doc.text('Director General', W-M-bw+3, footY+30);
+
+    // ── Bottom strip ──
+    doc.setFillColor(...navy);
+    doc.rect(0, H-9, W, 9, 'F');
+    doc.setTextColor(120,140,170);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(6);
+    const ts = new Date().toLocaleString('es-ES');
+    doc.text(`Documento generado digitalmente · ${docNumber} · ${ts}`, M, H-3.5);
+
+    // ── Save counter & download ──
+    const nombre = document.getElementById('nombre').value.trim();
+    const fd = document.getElementById('fecha').value;
+    const d = new Date(fd+'T12:00:00');
+    const yr = d.getFullYear();
+    const mo = String(d.getMonth()+1).padStart(2,'0');
+    const ini = nombre.split(/\s+/).map(w=>w[0]||'').join('').toUpperCase().slice(0,4);
+    const key = `maffin_counter_${yr}_${mo}_${ini}`;
+    const seq = parseInt(docNumber.split('/').pop());
+
+    try { await window.storage.set(key, seq.toString(), true); } catch(e) {}
+
+    const fname = docNumber.replace(/\//g,'_') + '.pdf';
+    doc.save(fname);
+
+    // ── Enviar por email ──
+    try {
+      btn.textContent = '📧 Enviando por correo…';
+      const pdfBase64 = doc.output('datauristring'); // base64 data URI
+
+      emailjs.init(EMAILJS_PUBLIC_KEY);
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_email:    DESTINO_EMAIL,
+        doc_numero:  docNumber,
+        solicitante: document.getElementById('nombre').value.trim(),
+        descripcion: document.getElementById('descripcion').value.trim(),
+        importe:     parseFloat(document.getElementById('importe').value).toFixed(2) + ' €',
+        forma_pago:  document.getElementById('pago').value,
+        fecha:       new Date(document.getElementById('fecha').value + 'T12:00:00').toLocaleDateString('es-ES'),
+      });
+      showToast('✅ PDF descargado y enviado a contabilidad');
+      btn.textContent = '✅ Enviado correctamente';
+    } catch(emailErr) {
+      console.error('Email error:', emailErr);
+      showToast('⚠ PDF descargado, pero no se pudo enviar el correo');
+      btn.textContent = '⚠ Descargado (error al enviar)';
+    }
+    btn.disabled = false;
+
+  } catch(err) {
+    console.error(err);
+    showToast('❌ Error al generar el PDF. Inténtalo de nuevo.');
+    btn.textContent = '⬇ Descargar justificante PDF';
+    btn.disabled = false;
+  }
+}
+
+// ── Toast ───────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3800);
+}
+</script>
+</body>
+</html>
